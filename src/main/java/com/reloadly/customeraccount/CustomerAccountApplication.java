@@ -12,4 +12,8 @@ public class CustomerAccountApplication {
 		SpringApplication.run(CustomerAccountApplication.class, args);
 	}
 
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
 }

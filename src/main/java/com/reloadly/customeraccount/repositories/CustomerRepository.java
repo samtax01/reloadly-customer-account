@@ -31,11 +31,12 @@ public class CustomerRepository{
         Customer customer = modelMap.map(request, Customer.class);
 
         try{
+            // Save Customer
             iCustomerRepository.saveAndFlush(customer);
 
             return Mono.just(modelMap.map(customer, CustomerResponse.class));
         }catch (Exception ex){
-            throw new CustomException("Unable to create profile. " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -29,9 +29,14 @@ public class CustomerRepository{
             throw new CustomException("Email already exists", HttpStatus.BAD_REQUEST);
 
         Customer customer = modelMap.map(request, Customer.class);
-        iCustomerRepository.saveAndFlush(customer);
-        return Mono.just(modelMap.map(customer, CustomerResponse.class));
 
+        try{
+            iCustomerRepository.saveAndFlush(customer);
+
+            return Mono.just(modelMap.map(customer, CustomerResponse.class));
+        }catch (Exception ex){
+            throw new CustomException("Unable to create profile. " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

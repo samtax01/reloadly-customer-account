@@ -15,6 +15,9 @@ import java.util.*;
 @Component
 public class AuthorisationHelper {
 
+    /**
+     * MUST Have 64 Byte Length
+     */
     @Value("${jjwt.secret}")
     private String jwtSecret;
 

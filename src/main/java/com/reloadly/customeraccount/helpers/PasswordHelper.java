@@ -11,7 +11,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 @Component
-public class PasswordManager implements PasswordEncoder {
+public class PasswordHelper implements PasswordEncoder {
 
     @Value("${password.encoder.secret}")
     private String secret;

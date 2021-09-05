@@ -4,7 +4,7 @@ import com.reloadly.customeraccount.enums.Role;
 import com.reloadly.customeraccount.helpers.CustomException;
 import com.reloadly.customeraccount.helpers.HttpRequest;
 import com.reloadly.customeraccount.helpers.AuthorisationHelper;
-import com.reloadly.customeraccount.helpers.PasswordManager;
+import com.reloadly.customeraccount.helpers.PasswordHelper;
 import com.reloadly.customeraccount.models.Customer;
 import com.reloadly.customeraccount.models.requests.CustomerLoginRequest;
 import com.reloadly.customeraccount.models.requests.CustomerRequest;
@@ -30,19 +30,19 @@ public class CustomerRepository{
 
     private final ICustomerRepository iCustomerRepository;
     private final ModelMapper modelMap;
-    private final PasswordManager passwordManager;
+    private final PasswordHelper passwordHelper;
     private final AuthorisationHelper authorisationHelper;
 
 
     public CustomerRepository(
             ICustomerRepository iCustomerRepository,
             ModelMapper modelMap,
-            PasswordManager passwordManager,
+            PasswordHelper passwordHelper,
             AuthorisationHelper authorisationHelper
     ) {
         this.iCustomerRepository = iCustomerRepository;
         this.modelMap = modelMap;
-        this.passwordManager = passwordManager;
+        this.passwordHelper = passwordHelper;
         this.authorisationHelper = authorisationHelper;
     }
 
@@ -88,7 +88,7 @@ public class CustomerRepository{
             throw new CustomException("Email already exists", HttpStatus.BAD_REQUEST);
         Customer customer = modelMap.map(request, Customer.class);
         customer.setRoles(Role.USER.name());
-        customer.setPassword( passwordManager.encode(request.getPassword()) );
+        customer.setPassword( passwordHelper.encode(request.getPassword()) );
         try{
             // Save Customer
             iCustomerRepository.saveAndFlush(customer);
@@ -118,7 +118,7 @@ public class CustomerRepository{
         existingCustomer.setLastName(request.getLastName());
         existingCustomer.setEmail(request.getEmail());
         existingCustomer.setPhoneNumber(request.getPhoneNumber());
-        existingCustomer.setPassword( passwordManager.encode(request.getPassword()) );
+        existingCustomer.setPassword( passwordHelper.encode(request.getPassword()) );
         existingCustomer.setUpdatedAt(LocalDateTime.now());
 
         iCustomerRepository.saveAndFlush(existingCustomer);
@@ -134,7 +134,7 @@ public class CustomerRepository{
         var customer = iCustomerRepository.findByEmail(request.getEmail());
 
         // validate
-        if(customer == null || !passwordManager.matches(request.getPassword(), customer.getPassword()))
+        if(customer == null || !passwordHelper.matches(request.getPassword(), customer.getPassword()))
             throw new CustomException("Email/Password not valid", HttpStatus.UNAUTHORIZED);
         var response = modelMap.map(customer, CustomerAuthResponse.class);
 

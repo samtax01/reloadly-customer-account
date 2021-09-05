@@ -1,5 +1,6 @@
 package com.reloadly.customeraccount.repositories;
 
+import com.reloadly.customeraccount.configs.StaticData;
 import com.reloadly.customeraccount.enums.Role;
 import com.reloadly.customeraccount.helpers.CustomException;
 import com.reloadly.customeraccount.helpers.HttpRequest;
@@ -14,6 +15,7 @@ import com.reloadly.customeraccount.models.responses.CustomerResponse;
 import com.reloadly.customeraccount.repositories.interfaces.ICustomerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -27,6 +29,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class CustomerRepository{
+
+    @Value("${api.mail}")
+    private String mailApiLink;
 
     private final ICustomerRepository iCustomerRepository;
     private final ModelMapper modelMap;
@@ -149,11 +154,11 @@ public class CustomerRepository{
     public void sendWelcomeEmail(String customerEmail){
         var emailRequest = EmailRequest.builder()
                 .toEmail(customerEmail)
-                .subject("Welcome to Reloadly")
-                .body("Click <a href='#'>here</a> to validate your email. <br/>yada yada yada yada")
+                .subject(StaticData.WelcomeMailSubject)
+                .body(StaticData.WelcomeMailBody)
                 .build();
         try{
-            HttpRequest.make("http://localhost:8082/trips", HttpMethod.POST, emailRequest, String.class).subscribe( x->log.info("Email sent successfully. " + x) );
+            HttpRequest.make(mailApiLink, HttpMethod.POST, emailRequest, String.class).subscribe( x->log.info("Email sent successfully. " + x) );
         }catch (Exception ex){
             log.error("Unable to send email. " + ex.getMessage());
         }

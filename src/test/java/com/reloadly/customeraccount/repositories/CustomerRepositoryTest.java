@@ -28,10 +28,15 @@ public class CustomerRepositoryTest {
 
     @Test
     void canCreateCustomer() throws CustomException {
+        // Arrange
+        // Act
         var customer = customerRepository.create(Seeder.getCustomerRequest());
+
         StepVerifier
                 .create(customer)
-                .expectNextMatches(response -> !Objects.isNull(response))
+                .expectNextMatches(response ->
+                        // Assert
+                        !Objects.isNull(response))
                 .verifyComplete();
     }
 
@@ -43,10 +48,13 @@ public class CustomerRepositoryTest {
         existingCustomer.setId(1);
         Mockito.doReturn(Optional.of(existingCustomer)).when(iCustomerRepository).findById(Mockito.any());
 
+        // Act
         var customer = customerRepository.update(1L, Seeder.getCustomerRequest());
         StepVerifier
                 .create(customer)
-                .expectNextMatches(response -> response.getId() == existingCustomer.getId() )
+                .expectNextMatches(response ->
+                        // Assert
+                        response.getId() == existingCustomer.getId() )
                 .verifyComplete();
     }
 
@@ -58,10 +66,13 @@ public class CustomerRepositoryTest {
         existingCustomer.setId(1);
         Mockito.doReturn(Optional.of(existingCustomer)).when(iCustomerRepository).findById(Mockito.any());
 
+        // Act
         var customer = customerRepository.get(1L);
         StepVerifier
                 .create(customer)
-                .expectNextMatches(response -> response.getId() == existingCustomer.getId() )
+                .expectNextMatches(response ->
+                        // Assert
+                        response.getId() == existingCustomer.getId() )
                 .verifyComplete();
     }
 

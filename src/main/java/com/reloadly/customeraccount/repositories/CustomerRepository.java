@@ -58,7 +58,7 @@ public class CustomerRepository{
     public Mono<CustomerResponse> get(Long id) throws CustomException{
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
-            throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
+            throw new CustomException(StaticData.customerNotFound, HttpStatus.NOT_FOUND);
         return Mono.just(modelMap.map(customer.get(), CustomerResponse.class));
     }
 
@@ -69,7 +69,7 @@ public class CustomerRepository{
     public Mono<CustomerResponse> delete(Long id) throws CustomException{
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
-            throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
+            throw new CustomException(StaticData.customerNotFound, HttpStatus.NOT_FOUND);
         iCustomerRepository.delete(customer.get());
         return Mono.just(modelMap.map(customer.get(), CustomerResponse.class));
     }
@@ -90,7 +90,7 @@ public class CustomerRepository{
      */
     public Mono<CustomerResponse> create(CustomerRequest request) throws CustomException {
         if(iCustomerRepository.findByEmail(request.getEmail()) != null)
-            throw new CustomException("Email already exists", HttpStatus.BAD_REQUEST);
+            throw new CustomException(StaticData.alreadyExists, HttpStatus.BAD_REQUEST);
 
         Customer customer = modelMap.map(request, Customer.class);
         customer.setRoles(Role.USER.name());
@@ -113,7 +113,7 @@ public class CustomerRepository{
     public Mono<CustomerResponse> update(long id, CustomerRequest request) throws CustomException {
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
-            throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
+            throw new CustomException(StaticData.customerNotFound, HttpStatus.NOT_FOUND);
         var existingCustomer = customer.get();
 
         existingCustomer.setFirstName(request.getFirstName());
@@ -137,7 +137,7 @@ public class CustomerRepository{
 
         // validate
         if(customer == null || !passwordHelper.matches(request.getPassword(), customer.getPassword()))
-            throw new CustomException("Email/Password not valid", HttpStatus.UNAUTHORIZED);
+            throw new CustomException(StaticData.invalidLogin, HttpStatus.UNAUTHORIZED);
         var response = modelMap.map(customer, CustomerAuthResponse.class);
 
         // Generate Token

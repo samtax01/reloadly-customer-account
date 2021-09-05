@@ -50,23 +50,23 @@ public class CustomerRepository{
     /**
      * Get single customer
      */
-    public CustomerResponse get(Long id) throws CustomException{
+    public Mono<CustomerResponse> get(Long id) throws CustomException{
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
             throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
-        return modelMap.map(customer.get(), CustomerResponse.class);
+        return Mono.just(modelMap.map(customer.get(), CustomerResponse.class));
     }
 
 
     /**
      * Delete customer
      */
-    public CustomerResponse delete(Long id) throws CustomException{
+    public Mono<CustomerResponse> delete(Long id) throws CustomException{
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
             throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
         iCustomerRepository.delete(customer.get());
-        return modelMap.map(customer.get(), CustomerResponse.class);
+        return Mono.just(modelMap.map(customer.get(), CustomerResponse.class));
     }
 
 
@@ -74,8 +74,8 @@ public class CustomerRepository{
     /**
      * Get all customers
      */
-    public List<CustomerResponse> gets(){
-        return iCustomerRepository.findAll().stream().map(x-> modelMap.map(x, CustomerResponse.class) ).collect(Collectors.toList());
+    public Mono<List<CustomerResponse>> gets(){
+        return Mono.just(iCustomerRepository.findAll().stream().map(x-> modelMap.map(x, CustomerResponse.class) ).collect(Collectors.toList()));
     }
 
 
@@ -86,29 +86,26 @@ public class CustomerRepository{
     public Mono<CustomerResponse> create(CustomerRequest request) throws CustomException {
         if(iCustomerRepository.findByEmail(request.getEmail()) != null)
             throw new CustomException("Email already exists", HttpStatus.BAD_REQUEST);
+
         Customer customer = modelMap.map(request, Customer.class);
         customer.setRoles(Role.USER.name());
         customer.setPassword( passwordHelper.encode(request.getPassword()) );
-        try{
-            // Save Customer
-            iCustomerRepository.saveAndFlush(customer);
 
-            // Send Mail to Customer in the background
-            if(customer.getId() > 0){
-                sendWelcomeEmail(customer.getEmail());
-            }
+        // Save Customer
+        iCustomerRepository.saveAndFlush(customer);
 
-            return Mono.just(modelMap.map(customer, CustomerResponse.class));
-        }catch (Exception ex){
-            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        // Send Mail to Customer in the background
+        if(customer.getId() > 0){
+            sendWelcomeEmail(customer.getEmail());
         }
+        return Mono.just(modelMap.map(customer, CustomerResponse.class));
     }
 
 
     /**
      * Update Customer
      */
-    public CustomerResponse update(long id, CustomerRequest request) throws CustomException {
+    public Mono<CustomerResponse> update(long id, CustomerRequest request) throws CustomException {
         var customer = iCustomerRepository.findById(id);
         if(customer.isEmpty())
             throw new CustomException("Customer not found", HttpStatus.NOT_FOUND);
@@ -122,14 +119,14 @@ public class CustomerRepository{
         existingCustomer.setUpdatedAt(LocalDateTime.now());
 
         iCustomerRepository.saveAndFlush(existingCustomer);
-        return modelMap.map(existingCustomer, CustomerResponse.class);
+        return Mono.just(modelMap.map(existingCustomer, CustomerResponse.class));
     }
 
 
     /**
      * Login
      */
-    public CustomerAuthResponse login(CustomerLoginRequest request) throws CustomException {
+    public Mono<CustomerAuthResponse> login(CustomerLoginRequest request) throws CustomException {
         // get user
         var customer = iCustomerRepository.findByEmail(request.getEmail());
 
@@ -140,7 +137,7 @@ public class CustomerRepository{
 
         // Generate Token
         response.setToken(authorisationHelper.generateJwt(customer.getEmail(), customer.getRoles()));
-        return response;
+        return Mono.just(response);
     }
 
 
@@ -151,7 +148,7 @@ public class CustomerRepository{
     @Async
     public void sendWelcomeEmail(String customerEmail){
         var emailRequest = EmailRequest.builder()
-                .email(customerEmail)
+                .toEmail(customerEmail)
                 .subject("Welcome to Reloadly")
                 .body("Click <a href='#'>here</a> to validate your email. <br/>yada yada yada yada")
                 .build();

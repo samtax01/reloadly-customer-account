@@ -17,7 +17,11 @@ public class EmailRequest {
 
     @NotBlank
     @Email
-    private String email;
+    private String toEmail;
+
+    @NotBlank
+    @Email
+    private String fromEmail;
 
     @NotBlank
     private String subject;

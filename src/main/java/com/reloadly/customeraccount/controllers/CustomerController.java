@@ -13,14 +13,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/v1/customers")
 public class CustomerController {
 
     private final CustomerRepository repository;
@@ -49,9 +48,9 @@ public class CustomerController {
             @ApiResponse(responseCode = "200", description = "Customer Updated", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",  content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)) })
     })
-    public ResponseEntity<Response<CustomerResponse>> updateCustomer(@PathVariable long id, @RequestBody CustomerRequest request) {
+    public Mono<ResponseEntity<Response<CustomerResponse>>> updateCustomer(@PathVariable long id, @RequestBody CustomerRequest request) {
         Validator.validate(request);
-        return ResponseEntity.ok(Response.success(repository.update(id, request)));
+        return repository.update(id, request).map(x->  ResponseEntity.ok(Response.success(x)));
     }
 
 
@@ -63,7 +62,7 @@ public class CustomerController {
     })
     @GetMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Response<CustomerResponse>>> getCustomer(@PathVariable final long id){
-        return Mono.just(ResponseEntity.ok(Response.success(repository.get(id))));
+        return repository.get(id).map(x-> ResponseEntity.ok(Response.success(x)));
     }
 
 
@@ -74,8 +73,8 @@ public class CustomerController {
             @ApiResponse(responseCode = "404", description = "Item not found",  content = @Content)
     })
     @DeleteMapping(path = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<CustomerResponse>> deleteCustomer(@PathVariable final long id){
-        return ResponseEntity.ok(Response.success(repository.delete(id)));
+    public Mono<ResponseEntity<Response<CustomerResponse>>> deleteCustomer(@PathVariable final long id){
+        return repository.delete(id).map(x -> ResponseEntity.ok(Response.success(x)));
     }
 
 
@@ -85,8 +84,8 @@ public class CustomerController {
             @ApiResponse(responseCode = "200", description = "Item list", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)) }),
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<List<CustomerResponse>>> getCustomers(){
-        return ResponseEntity.ok(Response.success(repository.gets()));
+    public Mono<ResponseEntity<Response<List<CustomerResponse>>>> getCustomers(){
+        return repository.gets().map(x-> ResponseEntity.ok(Response.success(x)));
     }
 
 }

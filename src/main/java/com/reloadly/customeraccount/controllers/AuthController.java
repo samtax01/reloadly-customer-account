@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final CustomerRepository repository;
@@ -27,9 +28,9 @@ public class AuthController {
     @SneakyThrows
     @Operation(summary = "Login with email and password to get a JWT")
     @PostMapping(path = "login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<CustomerAuthResponse>> login(@RequestBody CustomerLoginRequest request){
+    public Mono<ResponseEntity<Response<CustomerAuthResponse>>> login(@RequestBody CustomerLoginRequest request){
         Validator.validate(request);
-        return ResponseEntity.ok(Response.success(repository.login(request)));
+        return repository.login(request).map(x-> ResponseEntity.ok(Response.success(x)));
     }
 
 

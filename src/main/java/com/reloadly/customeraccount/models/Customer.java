@@ -1,6 +1,7 @@
 package com.reloadly.customeraccount.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.reloadly.customeraccount.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,8 +48,8 @@ public class Customer{
 
     private String roles;
 
-    private final LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private final LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 }

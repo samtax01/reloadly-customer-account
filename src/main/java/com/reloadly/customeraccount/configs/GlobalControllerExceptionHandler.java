@@ -12,6 +12,9 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.sql.SQLException;
 
+/**
+ * Handle global exception
+ */
 @Slf4j
 @ResponseBody
 @RestControllerAdvice(basePackages = "com.reloadly.customeraccount.controllers")

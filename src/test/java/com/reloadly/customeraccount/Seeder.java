@@ -33,7 +33,7 @@ public class Seeder {
         return EmailRequest
                 .builder()
                 .toEmail("hello@samsonoyetola.com")
-                .fromEmail("hello@reloadly.com")
+                .fromEmail("notification@reloadly.com")
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.reloadly.customeraccount.controllers;
 
+import com.reloadly.customeraccount.helpers.CustomException;
 import com.reloadly.customeraccount.helpers.Response;
 import com.reloadly.customeraccount.helpers.Validator;
 import com.reloadly.customeraccount.models.requests.CustomerLoginRequest;
@@ -25,10 +26,9 @@ public class AuthController {
         this.repository = repository;
     }
 
-    @SneakyThrows
     @Operation(summary = "Login with email and password to get a JWT")
     @PostMapping(path = "login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Response<CustomerAuthResponse>>> login(@RequestBody CustomerLoginRequest request){
+    public Mono<ResponseEntity<Response<CustomerAuthResponse>>> login(@RequestBody CustomerLoginRequest request) throws CustomException {
         Validator.validate(request);
         return repository.login(request).map(x-> ResponseEntity.ok(Response.success(x)));
     }

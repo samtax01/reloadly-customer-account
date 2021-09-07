@@ -4,6 +4,7 @@ import com.reloadly.customeraccount.helpers.CustomException;
 import com.reloadly.customeraccount.helpers.Response;
 import com.reloadly.customeraccount.helpers.Validator;
 import com.reloadly.customeraccount.models.requests.CustomerRequest;
+import com.reloadly.customeraccount.models.responses.CustomerAuthResponse;
 import com.reloadly.customeraccount.models.responses.CustomerResponse;
 import com.reloadly.customeraccount.repositories.CustomerRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ public class CustomerController {
             @ApiResponse(responseCode = "201", description = "Customer Created", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",  content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)) })
     })
-    public Mono<ResponseEntity<Response<CustomerResponse>>> createCustomer(@RequestBody CustomerRequest request)  throws CustomException {
+    public Mono<ResponseEntity<Response<CustomerAuthResponse>>> createCustomer(@RequestBody CustomerRequest request)  throws CustomException {
         Validator.validate(request);
         return repository.create(request).map(x-> ResponseEntity.ok(Response.success(x)));
     }

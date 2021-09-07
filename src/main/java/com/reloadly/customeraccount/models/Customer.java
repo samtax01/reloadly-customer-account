@@ -26,11 +26,11 @@ public class Customer{
     private long id;
 
     @NotBlank
-    @Column(length = 50)
+    @Column(length = 50, name = "first_name")
     private String firstName;
 
     @NotBlank
-    @Column(length = 50)
+    @Column(length = 50, name = "last_name")
     private String lastName;
 
     @NotBlank
@@ -38,7 +38,7 @@ public class Customer{
     @Column(length = 50, unique = true)
     private String email;
 
-    @Column(length = 30)
+    @Column(length = 30, name = "phone_number")
     private String phoneNumber;
 
     @JsonIgnore
@@ -48,8 +48,10 @@ public class Customer{
 
     private String roles;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
 }

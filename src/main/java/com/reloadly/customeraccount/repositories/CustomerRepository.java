@@ -88,7 +88,7 @@ public class CustomerRepository{
     /**
      * Create Customer
      */
-    public Mono<CustomerResponse> create(CustomerRequest request) throws CustomException {
+    public Mono<CustomerAuthResponse> create(CustomerRequest request) throws CustomException {
         if(iCustomerRepository.findByEmail(request.getEmail()) != null)
             throw new CustomException(StaticData.alreadyExists, HttpStatus.BAD_REQUEST);
 
@@ -103,7 +103,12 @@ public class CustomerRepository{
         if(customer.getId() > 0){
             sendWelcomeEmail(customer.getEmail());
         }
-        return Mono.just(modelMap.map(customer, CustomerResponse.class));
+        var response = modelMap.map(customer, CustomerAuthResponse.class);
+
+        // Generate Token
+        response.setToken(authorisationHelper.generateJwt(customer.getEmail(), customer.getRoles()));
+
+        return Mono.just(response);
     }
 
 
@@ -153,7 +158,7 @@ public class CustomerRepository{
     @Async
     public void sendWelcomeEmail(String customerEmail){
         var emailRequest = EmailRequest.builder()
-                .toEmail(customerEmail)
+                .to(customerEmail)
                 .subject(StaticData.WelcomeMailSubject)
                 .body(StaticData.WelcomeMailBody)
                 .build();

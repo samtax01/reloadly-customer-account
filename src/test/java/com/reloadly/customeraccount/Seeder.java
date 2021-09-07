@@ -32,8 +32,9 @@ public class Seeder {
     public static EmailRequest getEmailRequest(){
         return EmailRequest
                 .builder()
-                .toEmail("hello@samsonoyetola.com")
-                .fromEmail("notification@reloadly.com")
+                .to("hello@samsonoyetola.com")
+                .subject("Hi")
+                .body("Hello World")
                 .build();
     }
 

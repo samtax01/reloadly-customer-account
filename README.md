@@ -13,6 +13,9 @@ Customer would be able to
 - Accessing Data with JPA
 - JUnit
 
+### Running the application locally
+- mvn clean package (To reinstall plugins)
+- mvn spring-boot:run (To start the project)
 
 ### Basic Onboarding information:
 ```json
